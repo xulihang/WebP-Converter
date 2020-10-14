@@ -1,0 +1,164 @@
+﻿AppType=JavaFX
+Build1=Default,b4j.example
+File1=main.bjl
+FileGroup1=Default Group
+Group=Default Group
+Library1=jcore
+Library2=jfx
+Library3=jxui
+Library4=javaobject
+Module1=WebP
+NumberOfFiles=1
+NumberOfLibraries=4
+NumberOfModules=1
+Version=7.8
+@EndOfDesignText@
+#Region Project Attributes 
+	#MainFormWidth: 600
+	#MainFormHeight: 600 
+#End Region
+
+#AdditionalJar: webp-imageio-core-0.1.2
+
+Sub Process_Globals
+	Private fx As JFX
+	Private MainForm As Form
+	Private ImageView1 As ImageView
+	Private ListView1 As ListView
+End Sub
+
+Sub AppStart (Form1 As Form, Args() As String)
+	MainForm = Form1
+	MainForm.RootPane.LoadLayout("main") 'Load the layout file.
+	MainForm.Show
+End Sub
+
+'Return true to allow the default exceptions handler to handle the uncaught exception.
+Sub Application_Error (Error As Exception, StackTrace As String) As Boolean
+	Return True
+End Sub
+
+Sub Button1_MouseClicked (EventData As MouseEvent)
+	ListView1.Items.Clear
+	Dim dc As DirectoryChooser
+	dc.Initialize
+	Dim path As String=dc.Show(MainForm)
+	If path<>"" Then
+		import(path)
+	End If
+End Sub
+
+
+Public Sub import(dirPath As String) As Boolean
+	Dim filesList As List
+	filesList.Initialize
+	importDir(dirPath,filesList)
+	If filesList.Size=0 Then
+		Return False
+	End If
+	For Each fileAndDir() As String In filesList
+		Dim lbl As Label
+		lbl.Initialize("")
+		lbl.Tag=fileAndDir
+		Dim filename As String = fileAndDir(0)
+		Dim dirPath As String = fileAndDir(1)
+		lbl.Text=File.Combine(dirPath,filename)
+		ListView1.Items.Add(lbl)
+	Next
+	Return True
+End Sub
+
+Sub importDir(dirPath As String,filesList As List)
+	Dim files As List=File.ListFiles(dirPath)
+	For Each filename As String In files
+		If File.IsDirectory(dirPath,filename) Then
+			importDir(File.Combine(dirPath,filename),filesList)
+		End If
+		Dim lowerCaseName As String=filename.ToLowerCase
+		If lowerCaseName.EndsWith(".webp") Or lowerCaseName.EndsWith(".jpg") Or lowerCaseName.EndsWith(".png") Or lowerCaseName.EndsWith(".bmp") Then
+			Dim fileAndDir(2) As String
+			fileAndDir(0)=filename
+			fileAndDir(1)=dirPath
+			filesList.Add(fileAndDir)
+		End If
+	Next
+End Sub
+
+Sub ListView1_SelectedIndexChanged(Index As Int)
+	If ListView1.SelectedItem<>"" Then
+		Dim lbl As Label=ListView1.SelectedItem
+		Dim fileAndDir(2) As String=lbl.Tag
+		Dim filename As String = fileAndDir(0)
+		Dim dirPath As String = fileAndDir(1)
+		If filename.ToLowerCase.EndsWith(".webp") Then
+			Dim wp As WebP
+			wp.Initialize
+			ImageView1.SetImage(wp.LoadImage(dirPath,filename))
+		Else
+			ImageView1.SetImage(fx.LoadImage(dirPath,filename))
+		End If
+
+	End If
+End Sub
+
+Sub Button2_MouseClicked (EventData As MouseEvent)
+	Dim list1 As List
+	list1.Initialize
+	list1.AddAll(ListView1.Items)
+	For Each lbl As Label In list1
+		'Sleep(0)
+		Dim fileAndDir(2) As String=lbl.Tag
+		Dim filename As String = fileAndDir(0)
+		Dim dirPath As String = fileAndDir(1)
+		If filename.ToLowerCase.EndsWith(".webp")=False Then
+			Dim wp As WebP
+			wp.Initialize
+			Dim bmp As B4XBitmap=fx.LoadImage(dirPath,filename)
+			Dim newname As String=GetFilenameWithoutExtensionAndParent(filename)&".webp"
+			wp.ConvertToWebP(bmp,0.8,dirPath,newname)
+			ListView1.Items.RemoveAt(ListView1.Items.IndexOf(lbl))
+		End If
+	Next
+	fx.Msgbox(MainForm,"Done","")
+End Sub
+
+Sub Button3_MouseClicked (EventData As MouseEvent)
+	Dim list1 As List
+	list1.Initialize
+	list1.AddAll(ListView1.Items)
+	For Each lbl As Label In list1
+		Sleep(0)
+		Dim fileAndDir(2) As String=lbl.Tag
+		Dim filename As String = fileAndDir(0)
+		Dim dirPath As String = fileAndDir(1)
+		If filename.ToLowerCase.EndsWith(".webp") Then
+			Dim wp As WebP
+			wp.Initialize
+			Dim bmp As B4XBitmap=wp.LoadImage(dirPath,filename)
+			Dim newname As String=GetFilenameWithoutExtensionAndParent(filename)&".jpg"
+			Dim out As OutputStream=File.OpenOutput(dirPath,newname,False)
+			bmp.WriteToStream(out,100,"JPEG")
+			out.Close
+			ListView1.Items.RemoveAt(ListView1.Items.IndexOf(lbl))
+		End If
+	Next
+	fx.Msgbox(MainForm,"Done","")
+End Sub
+
+
+Sub GetFilenameWithoutExtensionAndParent(filename As String) As String
+	Try
+		If filename.Contains(".") Then
+			filename=filename.SubString2(0,filename.LastIndexOf("."))
+		End If
+		If filename.Contains("/") Then
+			filename=filename.SubString2(filename.LastIndexOf("/")+1,filename.Length)
+		End If
+		If filename.Contains("\") Then
+			filename=filename.SubString2(filename.LastIndexOf("\")+1,filename.Length)
+		End If
+	Catch
+		Log(LastException)
+	End Try
+	Return filename
+End Sub
