@@ -39,10 +39,11 @@ Sub ConvertToWebP(img As B4XBitmap,quality As Float,outputDir As String,outputFi
 	writer=imageio.RunMethodJO("getImageWritersByMIMEType",Array("image/webp")).RunMethod("next",Null)
 	Dim writeParam As JavaObject
 	writeParam.InitializeNewInstance("com.luciad.imageio.webp.WebPWriteParam",Array(writer.RunMethod("getLocale",Null)))
-	writeParam.RunMethod("setCompressionMode",Array(writeParam.GetField("MODE_EXPLICIT")))
-	Dim compressiontype As String="Lossy"
-	writeParam.RunMethod("setCompressionType",Array(compressiontype))
-	writeParam.RunMethod("setCompressionQuality",Array(quality))
+	writeParam.RunMethod("setCompressionMode",Array(writeParam.GetField("MODE_DEFAULT")))
+	'writeParam.RunMethod("setCompressionMode",Array(writeParam.GetField("MODE_EXPLICIT")))
+	'Dim compressiontype As String="Lossy"
+	'writeParam.RunMethod("setCompressionType",Array(compressiontype))
+	'writeParam.RunMethod("setCompressionQuality",Array(quality))
 	Dim imgfile As JavaObject
 	imgfile.InitializeNewInstance("java.io.File",Array(File.Combine(outputDir,outputFilename)))
 	Dim FileImageOutputStream As JavaObject

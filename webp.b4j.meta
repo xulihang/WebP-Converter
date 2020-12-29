@@ -4,6 +4,6 @@ ModuleBreakpoints0=
 ModuleBreakpoints1=
 ModuleClosedNodes0=
 ModuleClosedNodes1=
-NavigationStack=Main,import,46,6,Main,GetFilenameWithoutExtensionAndParent,106,0,Main,importDir,63,3,Main,Button1_MouseClicked,26,6,Main,ListView1_SelectedIndexChanged,77,6,Visual Designer,main.bjl,-100,6,Main,Button3_MouseClicked,114,6,WebP,Class_Globals,0,0,WebP,ConvertToWebP,38,6,Main,Button2_MouseClicked,102,6
+NavigationStack=Main,ListView1_SelectedIndexChanged,77,6,Visual Designer,main.bjl,-100,6,WebP,LoadImage,17,0,WebP,ConvertToWebP,35,6,WebP,Class_Globals,0,0,WebP,Initialize,7,0,Main,Process_Globals,13,0,Main,Button2_MouseClicked,98,6,Main,Button3_MouseClicked,119,6,Main,AppStart,24,6
 SelectedBuild=0
 VisibleModules=1

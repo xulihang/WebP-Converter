@@ -28,9 +28,21 @@ Sub Process_Globals
 End Sub
 
 Sub AppStart (Form1 As Form, Args() As String)
-	MainForm = Form1
-	MainForm.RootPane.LoadLayout("main") 'Load the layout file.
-	MainForm.Show
+	If Args.Length=2 Then
+		Dim wp As WebP
+		wp.Initialize
+		Dim bmp As B4XBitmap=wp.LoadImage(Args(0),"")
+		Dim out As OutputStream
+		out=File.OpenOutput(Args(1),"",False)
+		bmp.WriteToStream(out,100,"JPEG")
+		out.Flush
+		out.Close
+		ExitApplication2(0)
+	Else
+		MainForm = Form1
+		MainForm.RootPane.LoadLayout("main") 'Load the layout file.
+		MainForm.Show
+	End If
 End Sub
 
 'Return true to allow the default exceptions handler to handle the uncaught exception.
